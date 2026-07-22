@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/rooms")
 @RequiredArgsConstructor
 public class RoomController {
 
     private final RoomService roomService;
 
-    @GetMapping("/rooms")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<RoomResponse> getAllRooms(){
         return roomService.findAll();
