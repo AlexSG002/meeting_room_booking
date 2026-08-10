@@ -1,6 +1,8 @@
 package com.alejandro.meetingbooking.service.impl;
 
 import com.alejandro.meetingbooking.dto.request.ReservationRequest;
+import com.alejandro.meetingbooking.dto.response.AvailabilityResponse;
+import com.alejandro.meetingbooking.dto.response.AvailableSlotResponse;
 import com.alejandro.meetingbooking.dto.response.ReservationResponse;
 import com.alejandro.meetingbooking.entity.Employee;
 import com.alejandro.meetingbooking.entity.Reservation;
@@ -16,7 +18,10 @@ import com.alejandro.meetingbooking.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -78,6 +83,50 @@ public class ReservationServiceImpl implements ReservationService {
     public List<ReservationResponse> findAll() {
         List<Reservation> reservations = reservationRepo.findAll();
         return reservations.stream().map(ReservationMapper::toResponse).toList();
+    }
+
+    @Override
+    public AvailabilityResponse getAvailability(Long roomId, LocalDate date) {
+        roomRepo.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+        LocalDateTime startOfDay = date.atTime(8,0);
+        LocalDateTime endOfDay = date.atTime(20,0);
+        List<Reservation> reservations = reservationRepo.findReservationsForPeriod(roomId, startOfDay, endOfDay);
+        System.out.println("ROOM ID: " + roomId);
+        System.out.println("START: " + startOfDay);
+        System.out.println("END: " + endOfDay);
+        System.out.println("RESERVATIONS: " + reservations.size());
+
+        for (Reservation reservation : reservations) {
+            System.out.println(
+                    "RESERVATION: " +
+                            reservation.getId() + " | " +
+                            reservation.getStartTime() + " -> " +
+                            reservation.getEndTime() +
+                            " | ROOM: " + reservation.getRoom().getId()
+            );
+        }
+        List<AvailableSlotResponse> availableSlots = new ArrayList<>();
+        LocalDateTime currentDateTime = startOfDay;
+        for(Reservation reservation : reservations) {
+            if (currentDateTime.isBefore(reservation.getStartTime())) {
+                availableSlots.add(AvailableSlotResponse.builder().startTime(currentDateTime).endTime(reservation
+                        .getStartTime()).build());
+            }
+
+            if(currentDateTime.isBefore(reservation.getEndTime())) {
+                currentDateTime = reservation.getEndTime();
+            }
+        }
+
+        if(currentDateTime.isBefore(endOfDay)) {
+            availableSlots.add(AvailableSlotResponse.builder().startTime(currentDateTime).endTime(endOfDay).build());
+        }
+
+        return AvailabilityResponse.builder()
+                .roomId(roomId)
+                .date(date)
+                .availableSlots(availableSlots)
+                .build();
     }
 
 

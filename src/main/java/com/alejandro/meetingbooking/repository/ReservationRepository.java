@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -20,4 +21,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime
             );
+
+    @Query("SELECT r " +
+            "FROM Reservation r " +
+            "WHERE r.room.id =:roomId " +
+            "AND r.startTime <:endOfDay " +
+            "AND r.endTime >:startOfDay " +
+            "ORDER BY r.startTime")
+    List<Reservation> findReservationsForPeriod(@Param("roomId") Long roomId,
+                                                @Param("startOfDay") LocalDateTime startOfDay,
+                                                @Param("endOfDay") LocalDateTime endOfDay);
 }
