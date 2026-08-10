@@ -1,6 +1,6 @@
 package com.alejandro.meetingbooking.service.impl;
 
-import com.alejandro.meetingbooking.dto.request.CreateReservationRequest;
+import com.alejandro.meetingbooking.dto.request.ReservationRequest;
 import com.alejandro.meetingbooking.dto.response.ReservationResponse;
 import com.alejandro.meetingbooking.entity.Employee;
 import com.alejandro.meetingbooking.entity.Reservation;
@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final EmployeeRepository employeeRepo;
     private final RoomRepository roomRepo;
     @Override
-    public ReservationResponse createReservation(CreateReservationRequest request) {
+    public ReservationResponse createReservation(ReservationRequest request) {
 
         if(!request.getStartTime().isBefore(request.getEndTime())){
             throw new InvalidReservationException("The start time must be before the end time.");
@@ -59,5 +60,25 @@ public class ReservationServiceImpl implements ReservationService {
 
         return ReservationMapper.toResponse(savedReservation);
     }
+
+    @Override
+    public void cancelReservation(Long reservationId) {
+        Reservation reservation = reservationRepo.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
+        reservationRepo.delete(reservation);
+
+    }
+
+    @Override
+    public ReservationResponse findReservation(Long reservationId) {
+        Reservation reservation = reservationRepo.findById(reservationId).orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
+        return ReservationMapper.toResponse(reservation);
+    }
+
+    @Override
+    public List<ReservationResponse> findAll() {
+        List<Reservation> reservations = reservationRepo.findAll();
+        return reservations.stream().map(ReservationMapper::toResponse).toList();
+    }
+
 
 }

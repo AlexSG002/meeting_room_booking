@@ -1,6 +1,6 @@
 package com.alejandro.meetingbooking.mapper;
 
-import com.alejandro.meetingbooking.dto.request.CreateReservationRequest;
+import com.alejandro.meetingbooking.dto.request.ReservationRequest;
 import com.alejandro.meetingbooking.dto.response.ReservationResponse;
 import com.alejandro.meetingbooking.entity.Reservation;
 
@@ -10,7 +10,7 @@ public final class ReservationMapper {
 
     }
 
-    public static Reservation toEntity(CreateReservationRequest request){
+    public static Reservation toEntity(ReservationRequest request){
         return Reservation.builder()
                 .title(request.getTitle())
                 .startTime(request.getStartTime())
