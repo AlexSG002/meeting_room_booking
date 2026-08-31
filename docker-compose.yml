@@ -14,5 +14,11 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  kafka:
+    image: apache/kafka:4.3.1
+    container_name: kafka-meeting
+    ports:
+      - "9092:9092"
+
 volumes:
   mysql_data:
