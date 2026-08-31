@@ -1,0 +1,6 @@
+CREATE TABLE room (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    capacity INT NOT NULL,
+    location VARCHAR(100) NOT NULL
+);
