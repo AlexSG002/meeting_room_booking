@@ -1,4 +1,4 @@
-package com.alejandro.meetingbooking.event;
+package com.alejandro.notification.event;
 
 import java.time.LocalDateTime;
 

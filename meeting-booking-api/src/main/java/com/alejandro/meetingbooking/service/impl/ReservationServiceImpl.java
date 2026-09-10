@@ -68,6 +68,7 @@ public class ReservationServiceImpl implements ReservationService {
         ReservationCreatedEvent event = new ReservationCreatedEvent(savedReservation.getId(),
                 savedReservation.getRoom().getId(),
                 savedReservation.getEmployee().getId(),
+                savedReservation.getEmployee().getEmail(),
                 savedReservation.getTitle(),
                 savedReservation.getStartTime(),
                 savedReservation.getEndTime());
