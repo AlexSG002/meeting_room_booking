@@ -1,0 +1,129 @@
+<div class="main-screen">
+
+  <header class="header">
+
+    <div class="brand">
+      <h1>Meeting Booking</h1>
+      <span>Gestión de salas</span>
+    </div>
+
+    <button class="profile-button">
+      Alejandro
+    </button>
+
+  </header>
+
+
+  <main class="content">
+
+    <div class="toolbar">
+
+      <div class="room-selector">
+        <label for="room">Sala</label>
+
+        <select id="room" [(ngModel)]="selectedRoom">
+          @for (room of rooms; track room) {
+          <option [value]="room">
+            {{ room }}
+          </option>
+          }
+        </select>
+      </div>
+
+
+      <div class="date-navigation">
+
+        <button
+          class="navigation-button"
+          (click)="previousDay()">
+          ←
+        </button>
+
+        <div class="current-date">
+          <strong>{{ formattedDate }}</strong>
+          <span>{{ formattedYear }}</span>
+        </div>
+
+        <button
+          class="navigation-button"
+          (click)="nextDay()">
+          →
+        </button>
+
+      </div>
+
+
+      <button
+        class="create-button"
+        (click)="createReservation()">
+        + Nueva reserva
+      </button>
+
+    </div>
+
+
+    <section class="calendar">
+
+      <div class="calendar-header">
+        <div class="time-column-header">
+          Hora
+        </div>
+
+        <div class="room-header">
+          {{ selectedRoom }}
+        </div>
+      </div>
+
+
+      <div class="calendar-body">
+
+        @for (hour of ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']; track hour) {
+
+        <div class="time-row">
+
+          <div class="time">
+            {{ hour }}
+          </div>
+
+          <div class="time-slot"></div>
+
+        </div>
+
+        }
+
+        <div class="reservations-container">
+
+          @for (reservation of filteredReservations; track reservation.id) {
+
+          <div
+            class="reservation"
+            [style.top.px]="getReservationTop(reservation)"
+            [style.height.px]="getReservationHeight(reservation)">
+
+            <strong>
+              {{ reservation.title }}
+            </strong>
+
+            <span>
+          {{ reservation.startTime.slice(11, 16) }} -
+          {{ reservation.endTime.slice(11, 16) }}
+        </span>
+
+            <small>
+              {{ reservation.employeeName }}
+            </small>
+
+          </div>
+
+          }
+
+        </div>
+
+      </div>
+
+
+    </section>
+
+  </main>
+
+</div>

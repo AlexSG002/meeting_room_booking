@@ -1,0 +1,306 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.main-screen {
+  min-height: 100vh;
+  background: #f5f7fa;
+  color: #1f2937;
+}
+
+
+/* HEADER */
+
+.header {
+  height: 72px;
+  padding: 0 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.brand span {
+  display: block;
+  margin-top: 3px;
+
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.profile-button {
+  border: none;
+  background: #f3f4f6;
+
+  padding: 9px 16px;
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+
+/* CONTENT */
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+
+/* TOOLBAR */
+
+.toolbar {
+  display: flex;
+  align-items: end;
+  gap: 20px;
+
+  margin-bottom: 24px;
+}
+
+.room-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.room-selector label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.room-selector select {
+  min-width: 150px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background: white;
+  font-size: 14px;
+}
+
+
+/* DATE NAVIGATION */
+
+.date-navigation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-left: auto;
+}
+
+.navigation-button {
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background: white;
+
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.navigation-button:hover {
+  background: #f3f4f6;
+}
+
+.current-date {
+  min-width: 190px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  font-size: 14px;
+}
+
+.current-date span {
+  margin-top: 3px;
+
+  font-size: 12px;
+  color: #6b7280;
+}
+
+
+/* CREATE BUTTON */
+
+.create-button {
+  padding: 11px 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.create-button:hover {
+  background: #1d4ed8;
+}
+
+
+/* CALENDAR */
+
+.calendar {
+  overflow: hidden;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+
+/* CALENDAR HEADER */
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+
+  background: #f9fafb;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.time-column-header,
+.room-header {
+  padding: 14px 16px;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* CALENDAR BODY */
+
+.calendar-body {
+  position: relative;
+}
+
+.room-header {
+  border-left: 1px solid #e5e7eb;
+}
+
+
+/* TIME ROWS */
+
+.time-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+
+  height: 70px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.time-row:last-child {
+  border-bottom: none;
+}
+
+.time {
+  padding: 12px 16px;
+
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.time-slot {
+  border-left: 1px solid #e5e7eb;
+}
+
+
+/* RESERVATION */
+
+.reservation {
+  position: absolute;
+
+  left: 8px;
+  right: 8px;
+
+  box-sizing: border-box;
+
+  padding: 8px 10px;
+
+  border-radius: 8px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  overflow: hidden;
+
+  background: #dbeafe;
+  border-left: 4px solid #2563eb;
+
+  pointer-events: auto;
+}
+
+.reservation strong {
+  font-size: 13px;
+}
+
+.reservation span {
+  margin-top: 2px;
+
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.reservation small {
+  margin-top: 3px;
+
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.reservations-container {
+  position: absolute;
+  top: 0;
+  left: 90px;
+  right: 0;
+  height: 630px;
+  pointer-events: none;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 800px) {
+
+  .content {
+    padding: 20px;
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+  }
+
+  .date-navigation {
+    margin-left: 0;
+  }
+
+  .create-button {
+    width: 100%;
+  }
+
+}
