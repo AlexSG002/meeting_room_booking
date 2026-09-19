@@ -2,33 +2,36 @@ import {Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Reservation} from '../../models/reservation.model';
 import {ReservationService} from '../../services/reservation-service';
+import { ReservationModal } from '../reservation-modal/reservation-modal';
+import { Room } from '../../models/room.model';
+import { RoomService } from '../../services/room-service';
 
 @Component({
   selector: 'app-main-screen',
-  imports: [FormsModule],
+  imports: [FormsModule, ReservationModal],
   templateUrl: './main-screen.html',
   styleUrl: './main-screen.css'
 })
 export class MainScreen {
 
   private readonly reservationService = inject(ReservationService);
+  private readonly roomService = inject(RoomService);
 
   readonly hourHeight = 70;
   readonly calendarStartHour = 9;
 
-  selectedRoom = 'Sala Azul';
+  showReservationModal = false;
 
-  selectedDate = new Date(2026, 8, 18);
+  selectedRoom = '';
+
+  selectedDate = new Date();
 
   reservations: Reservation[] = [];
 
-  rooms = [
-    'Sala Azul',
-    'Sala Roja'
-  ];
-
+  rooms: Room[] = [];
   constructor() {
     this.loadReservations();
+    this.loadRooms();
   }
 
   getReservationTop(reservation: Reservation): number {
@@ -64,6 +67,22 @@ export class MainScreen {
       },
       error: (error) => {
         console.error('Error loading reservatios: ', error)
+      }
+    })
+  }
+
+  private loadRooms(): void {
+    this.roomService.getAllRooms().subscribe({
+      next: (rooms) => {
+        this.rooms = rooms;
+
+        if(rooms.length > 0){
+          this.selectedRoom = rooms[0].name;
+        }
+        console.log('Rooms:', rooms);
+      },
+      error: (error) => {
+        console.error('Error loading rooms: ')
       }
     })
   }
@@ -104,7 +123,7 @@ export class MainScreen {
   }
 
   createReservation(): void {
-    console.log('Create reservation');
+    this.showReservationModal = true;
   }
 
   get formattedDate(): string {

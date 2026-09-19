@@ -1,0 +1,143 @@
+<div class="modal-overlay">
+
+  <div class="reservation-modal">
+
+    <header class="modal-header">
+
+      <div>
+        <h2>Nueva reserva</h2>
+        <span>Crear una nueva reserva</span>
+      </div>
+
+      <button
+        class="close-button"
+        type="button"
+        (click)="closeReservationModal()">
+        ×
+      </button>
+
+    </header>
+
+
+    <div class="modal-body">
+
+      <div class="form-group">
+
+        <label for="title">
+          Título
+        </label>
+
+        <input
+          id="title"
+          type="text"
+          placeholder="Ej. Reunión de equipo">
+
+      </div>
+
+
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label for="room">
+            Sala
+          </label>
+
+          <select id="room">
+
+            <option>Sala Azul</option>
+            <option>Sala Roja</option>
+
+          </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="date">
+            Fecha
+          </label>
+
+          <input
+            id="date"
+            type="date">
+
+        </div>
+
+      </div>
+
+
+      <div class="availability">
+
+        <h3>Disponibilidad</h3>
+
+        <div class="availability-slots">
+
+          @for (slot of availability; track slot.startTime) {
+
+          <button type="button">
+            {{ slot.startTime.slice(11, 16) }}
+            -
+            {{ slot.endTime.slice(11, 16) }}
+          </button>
+
+          }
+
+        </div>
+
+      </div>
+
+
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label for="start">
+            Hora inicio
+          </label>
+
+          <input
+            id="start"
+            type="time">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="end">
+            Hora fin
+          </label>
+
+          <input
+            id="end"
+            type="time">
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <footer class="modal-footer">
+
+      <button
+        type="button"
+        class="cancel-button"
+        (click)="closeReservationModal()">
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        class="confirm-button">
+        Crear reserva
+      </button>
+
+    </footer>
+
+  </div>
+
+</div>

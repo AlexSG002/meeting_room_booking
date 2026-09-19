@@ -22,9 +22,9 @@
         <label for="room">Sala</label>
 
         <select id="room" [(ngModel)]="selectedRoom">
-          @for (room of rooms; track room) {
-          <option [value]="room">
-            {{ room }}
+          @for (room of rooms; track room.id) {
+          <option [value]="room.name">
+            {{ room.name }}
           </option>
           }
         </select>
@@ -123,6 +123,12 @@
 
 
     </section>
+
+      @if (showReservationModal){
+        <app-reservation-modal
+          (close)="showReservationModal = false">
+        </app-reservation-modal>
+      }
 
   </main>
 
