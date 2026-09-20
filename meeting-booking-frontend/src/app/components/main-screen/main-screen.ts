@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectorRef} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Reservation} from '../../models/reservation.model';
 import {ReservationService} from '../../services/reservation-service';
@@ -16,6 +16,7 @@ export class MainScreen {
 
   private readonly reservationService = inject(ReservationService);
   private readonly roomService = inject(RoomService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly hourHeight = 70;
   readonly calendarStartHour = 9;
@@ -63,6 +64,7 @@ export class MainScreen {
     this.reservationService.getAllReservations().subscribe({
       next: (reservations) => {
         this.reservations = reservations;
+        this.cdr.detectChanges();
         console.log('Reservations: ', reservations);
       },
       error: (error) => {
@@ -79,6 +81,7 @@ export class MainScreen {
         if(rooms.length > 0){
           this.selectedRoom = rooms[0].name;
         }
+        this.cdr.detectChanges();
         console.log('Rooms:', rooms);
       },
       error: (error) => {

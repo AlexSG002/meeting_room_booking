@@ -43,10 +43,16 @@
             Sala
           </label>
 
-          <select id="room">
+          <select
+            id="room"
+            [(ngModel)]="selectedRoomId"
+            (ngModelChange)="loadAvailability()">
 
-            <option>Sala Azul</option>
-            <option>Sala Roja</option>
+            @for (room of rooms(); track room.id) {
+            <option [ngValue]="room.id">
+              {{ room.name }}
+            </option>
+            }
 
           </select>
 
@@ -61,7 +67,9 @@
 
           <input
             id="date"
-            type="date">
+            type="date"
+            [(ngModel)]="selectedDate"
+            (ngModelChange)="loadAvailability()">
 
         </div>
 

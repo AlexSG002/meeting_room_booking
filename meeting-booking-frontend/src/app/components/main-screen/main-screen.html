@@ -126,6 +126,7 @@
 
       @if (showReservationModal){
         <app-reservation-modal
+          [rooms]="rooms"
           (close)="showReservationModal = false">
         </app-reservation-modal>
       }
