@@ -19,6 +19,7 @@ import com.alejandro.meetingbooking.service.ReservationService;
 import com.alejandro.meetingbooking.kafka.producer.ReservationEventProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,7 +33,9 @@ public class ReservationServiceImpl implements ReservationService {
     private final EmployeeRepository employeeRepo;
     private final RoomRepository roomRepo;
     private final ReservationEventProducer reservationEventProducer;
+
     @Override
+    @Transactional
     public ReservationResponse createReservation(ReservationRequest request) {
 
         if(!request.getStartTime().isBefore(request.getEndTime())){
@@ -43,11 +46,11 @@ public class ReservationServiceImpl implements ReservationService {
             throw new InvalidReservationException("Choose a valid start date");
         }
 
+        Room room = roomRepo.findByIdForUpdate(request.getRoomId())
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+
         Employee employee = employeeRepo.findById(request.getEmployeeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
-
-        Room room = roomRepo.findById(request.getRoomId())
-                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
 
         Reservation reservation = ReservationMapper.toEntity(request);
         reservation.setEmployee(employee);

@@ -8,6 +8,7 @@ import com.alejandro.meetingbooking.entity.*;
 import com.alejandro.meetingbooking.exception.InvalidReservationException;
 import com.alejandro.meetingbooking.exception.ReservationConflictException;
 import com.alejandro.meetingbooking.exception.ResourceNotFoundException;
+import com.alejandro.meetingbooking.kafka.producer.ReservationEventProducer;
 import com.alejandro.meetingbooking.repository.*;
 import com.alejandro.meetingbooking.service.impl.ReservationServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,9 @@ public class ReservationServiceImplTest {
 
     @Mock
     private RoomRepository roomRepo;
+
+    @Mock
+    private ReservationEventProducer reservationEventProducer;
 
     @InjectMocks
     private ReservationServiceImpl reservationService;
@@ -85,7 +89,7 @@ public class ReservationServiceImplTest {
         when(employeeRepo.findById(1L))
                 .thenReturn(Optional.of(employee));
 
-        when(roomRepo.findById(1L))
+        when(roomRepo.findByIdForUpdate(1L))
                 .thenReturn(Optional.of(room));
 
         when(reservationRepo.existsOverlappingReservation(
@@ -103,7 +107,7 @@ public class ReservationServiceImplTest {
         assertNotNull(response);
 
         verify(employeeRepo).findById(1L);
-        verify(roomRepo).findById(1L);
+        verify(roomRepo).findByIdForUpdate(1L);
 
         verify(reservationRepo).existsOverlappingReservation(
                 1L,
@@ -179,6 +183,8 @@ public class ReservationServiceImplTest {
 
         when(employeeRepo.findById(99L))
                 .thenReturn(Optional.empty());
+        when(roomRepo.findByIdForUpdate(1L))
+                .thenReturn(Optional.of(createRoom()));
 
         assertThrows(
                 ResourceNotFoundException.class,
@@ -186,7 +192,7 @@ public class ReservationServiceImplTest {
         );
 
         verify(employeeRepo).findById(99L);
-        verifyNoInteractions(roomRepo);
+        verify(roomRepo).findByIdForUpdate(1L);
         verify(reservationRepo, never()).save(any());
     }
 
@@ -210,7 +216,7 @@ public class ReservationServiceImplTest {
         when(employeeRepo.findById(1L))
                 .thenReturn(Optional.of(employee));
 
-        when(roomRepo.findById(1L))
+        when(roomRepo.findByIdForUpdate(1L))
                 .thenReturn(Optional.of(room));
 
         when(reservationRepo.existsOverlappingReservation(
