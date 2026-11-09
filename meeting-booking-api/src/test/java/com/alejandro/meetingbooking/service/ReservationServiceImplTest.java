@@ -8,7 +8,7 @@ import com.alejandro.meetingbooking.entity.*;
 import com.alejandro.meetingbooking.exception.InvalidReservationException;
 import com.alejandro.meetingbooking.exception.ReservationConflictException;
 import com.alejandro.meetingbooking.exception.ResourceNotFoundException;
-import com.alejandro.meetingbooking.kafka.producer.ReservationEventProducer;
+import com.alejandro.meetingbooking.outbox.OutboxMessage;
 import com.alejandro.meetingbooking.repository.*;
 import com.alejandro.meetingbooking.service.impl.ReservationServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,7 +40,10 @@ public class ReservationServiceImplTest {
     private RoomRepository roomRepo;
 
     @Mock
-    private ReservationEventProducer reservationEventProducer;
+    private OutboxMessageRepository outboxMessageRepo;
+
+    @Mock
+    private JsonMapper jsonMapper;
 
     @InjectMocks
     private ReservationServiceImpl reservationService;
@@ -62,7 +66,7 @@ public class ReservationServiceImplTest {
     }
 
     @Test
-    void shouldCreateReservationSuccessfully() {
+    void shouldCreateReservationSuccessfully() throws Exception {
 
         Employee employee = createEmployee();
         Room room = createRoom();
@@ -100,6 +104,8 @@ public class ReservationServiceImplTest {
 
         when(reservationRepo.save(any(Reservation.class)))
                 .thenReturn(reservation);
+        when(jsonMapper.writeValueAsString(any()))
+                .thenReturn("{}");
 
         ReservationResponse response =
                 reservationService.createReservation(request);
@@ -116,6 +122,7 @@ public class ReservationServiceImplTest {
         );
 
         verify(reservationRepo).save(any(Reservation.class));
+        verify(outboxMessageRepo).save(any(OutboxMessage.class));
     }
 
     @Test
@@ -194,6 +201,7 @@ public class ReservationServiceImplTest {
         verify(employeeRepo).findById(99L);
         verify(roomRepo).findByIdForUpdate(1L);
         verify(reservationRepo, never()).save(any());
+        verify(outboxMessageRepo, never()).save(any());
     }
 
     @Test

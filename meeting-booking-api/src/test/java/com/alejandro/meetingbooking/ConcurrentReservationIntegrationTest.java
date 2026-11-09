@@ -3,18 +3,18 @@ package com.alejandro.meetingbooking;
 import com.alejandro.meetingbooking.dto.request.ReservationRequest;
 import com.alejandro.meetingbooking.entity.Employee;
 import com.alejandro.meetingbooking.entity.Room;
+import com.alejandro.meetingbooking.outbox.OutboxStatus;
 import com.alejandro.meetingbooking.repository.EmployeeRepository;
+import com.alejandro.meetingbooking.repository.OutboxMessageRepository;
 import com.alejandro.meetingbooking.repository.ReservationRepository;
 import com.alejandro.meetingbooking.repository.RoomRepository;
 import com.alejandro.meetingbooking.exception.ReservationConflictException;
-import com.alejandro.meetingbooking.kafka.producer.ReservationEventProducer;
 import com.alejandro.meetingbooking.service.ReservationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Import(TestcontainersConfiguration.class)
-@SpringBootTest
+@SpringBootTest(properties = "app.outbox.enabled=false")
 class ConcurrentReservationIntegrationTest {
 
     @Autowired
@@ -43,8 +43,8 @@ class ConcurrentReservationIntegrationTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    @MockitoBean
-    private ReservationEventProducer reservationEventProducer;
+    @Autowired
+    private OutboxMessageRepository outboxMessageRepository;
 
     @Test
     @Timeout(30)
@@ -87,6 +87,10 @@ class ConcurrentReservationIntegrationTest {
 
             assertEquals(1, successfulReservations);
             assertEquals(1, reservationRepository.count());
+            assertEquals(1, outboxMessageRepository.count());
+            assertEquals(1, outboxMessageRepository.findAll().stream()
+                    .filter(message -> message.getStatus() == OutboxStatus.PENDING)
+                    .count());
         } finally {
             executor.shutdownNow();
         }
