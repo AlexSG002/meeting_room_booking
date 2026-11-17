@@ -7,18 +7,23 @@ import com.alejandro.meetingbooking.dto.response.ReservationResponse;
 import com.alejandro.meetingbooking.entity.Employee;
 import com.alejandro.meetingbooking.entity.Reservation;
 import com.alejandro.meetingbooking.entity.Room;
+import com.alejandro.meetingbooking.config.KafkaTopicConfig;
 import com.alejandro.meetingbooking.event.ReservationCreatedEvent;
 import com.alejandro.meetingbooking.exception.InvalidReservationException;
 import com.alejandro.meetingbooking.exception.ReservationConflictException;
 import com.alejandro.meetingbooking.exception.ResourceNotFoundException;
 import com.alejandro.meetingbooking.mapper.ReservationMapper;
 import com.alejandro.meetingbooking.repository.EmployeeRepository;
+import com.alejandro.meetingbooking.repository.OutboxMessageRepository;
 import com.alejandro.meetingbooking.repository.ReservationRepository;
 import com.alejandro.meetingbooking.repository.RoomRepository;
 import com.alejandro.meetingbooking.service.ReservationService;
-import com.alejandro.meetingbooking.kafka.producer.ReservationEventProducer;
+import com.alejandro.meetingbooking.outbox.OutboxMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,8 +36,11 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepo;
     private final EmployeeRepository employeeRepo;
     private final RoomRepository roomRepo;
-    private final ReservationEventProducer reservationEventProducer;
+    private final OutboxMessageRepository outboxMessageRepo;
+    private final JsonMapper jsonMapper;
+
     @Override
+    @Transactional
     public ReservationResponse createReservation(ReservationRequest request) {
 
         if(!request.getStartTime().isBefore(request.getEndTime())){
@@ -43,11 +51,11 @@ public class ReservationServiceImpl implements ReservationService {
             throw new InvalidReservationException("Choose a valid start date");
         }
 
+        Room room = roomRepo.findByIdForUpdate(request.getRoomId())
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+
         Employee employee = employeeRepo.findById(request.getEmployeeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
-
-        Room room = roomRepo.findById(request.getRoomId())
-                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
 
         Reservation reservation = ReservationMapper.toEntity(request);
         reservation.setEmployee(employee);
@@ -73,7 +81,16 @@ public class ReservationServiceImpl implements ReservationService {
                 savedReservation.getStartTime(),
                 savedReservation.getEndTime());
 
-        reservationEventProducer.sendReservationCreatedEvent(event);
+        try {
+            outboxMessageRepo.save(OutboxMessage.builder()
+                    .eventType(KafkaTopicConfig.RESERVATION_CREATED_TOPIC)
+                    .aggregateId(savedReservation.getId())
+                    .messageKey(savedReservation.getRoom().getId().toString())
+                    .payload(jsonMapper.writeValueAsString(event))
+                    .build());
+        } catch (JacksonException exception) {
+            throw new IllegalStateException("Could not serialize reservation-created event", exception);
+        }
 
         return ReservationMapper.toResponse(savedReservation);
     }
